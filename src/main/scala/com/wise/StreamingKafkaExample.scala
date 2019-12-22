@@ -23,7 +23,7 @@ object StreamingKafkaExample  {
     val sc = streamingContext.sparkContext
 
     val kafkaParams = Map[String, Object](
-      "bootstrap.servers" -> "localhost:9092",
+      "bootstrap.servers" -> "parallels-Parallels-Virtual-Platform:9092",
       "key.deserializer" -> classOf[StringDeserializer],
       "value.deserializer" -> classOf[StringDeserializer],
       "group.id" -> "use_a_separate_group_id_for_each_stream",
@@ -59,13 +59,15 @@ object StreamingKafkaExample  {
 //    }
 
     val hbaseConf = HBaseConfiguration.create()
+    hbaseConf.set("hbase.zookeeper.quorum", "localhost");
+    hbaseConf.set("hbase.zookeeper.property.clientPort", "2181");
     val connection = ConnectionFactory.createConnection(hbaseConf)
     val table = connection.getTable(TableName.valueOf( Bytes.toBytes("conta") ) )
 
     // Put example
     var put = new Put(Bytes.toBytes("row1"))
     put.addColumn(Bytes.toBytes("cf"), Bytes.toBytes("test_column_name"), Bytes.toBytes("test_value"))
-//    table.put(put)
+    table.put(put)
 
 
     streamingContext.start()
