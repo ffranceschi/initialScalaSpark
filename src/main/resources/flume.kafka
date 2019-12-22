@@ -1,0 +1,30 @@
+# Define a memory channel called ch1 on agent1
+agent1.channels.c1.type = memory
+ 
+# Define an Avro source called r1 on agent1 and tell it
+# to bind to 0.0.0.0:41414. Connect it to channel ch1.
+agent1.sources.r1.channels = c1
+agent1.sources.r1.type = spooldir
+agent1.sources.r1.spoolDir = /Users/fernando/teste/source
+
+ 
+# Define a logger sink that simply logs all events it receives
+# and connect it to the other end of the same channel.
+agent1.sinks.k1.channel = c1
+agent1.sinks.k1.type = org.apache.flume.sink.kafka.KafkaSink
+agent1.sinks.k1.kafka.topic = teste1
+agent1.sinks.k1.kafka.bootstrap.servers = localhost:9092
+agent1.sinks.k1.kafka.flumeBatchSize = 20
+agent1.sinks.k1.kafka.producer.acks = 1
+agent1.sinks.k1.kafka.producer.linger.ms = 1
+agent1.sinks.k1.kafka.producer.compression.type = snappy
+ 
+#agent1.sinks.k1.type = file_roll
+#agent1.sinks.k1.channel = c1
+#agent1.sinks.k1.sink.directory = /Users/fernando/teste/sink
+
+# Finally, now that we've defined all of our components, tell
+# agent1 which ones we want to activate.
+agent1.channels = c1
+agent1.sources = r1
+agent1.sinks = k1
