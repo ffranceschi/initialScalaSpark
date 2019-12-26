@@ -1,22 +1,28 @@
 package com.wise
 
-import java.io.{File, PrintWriter}
-
-import org.apache.hadoop.hbase.{HBaseConfiguration, TableName}
 import org.apache.hadoop.hbase.client.{ConnectionFactory, Put}
 import org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.hbase.{HBaseConfiguration, TableName}
 import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.spark.streaming.kafka010._
-import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
-import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark._
 import org.apache.spark.streaming._
+import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
+import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
+import org.apache.spark.streaming.kafka010._
 
-object StreamingKafkaExample  {
+case class Account(bank: String, accountName: String)
+
+object StreamingKafkaExample {
 
   def main(args: Array[String]) = {
+    new Runner().run
+  }
+}
 
 
+class Runner extends java.io.Serializable {
+  def run : Unit = {
+    val CONTA = "conta"
     val conf = new SparkConf().setMaster("local[*]").setAppName("streaming teste")
 
     val streamingContext = new StreamingContext(conf, Seconds(10))
@@ -45,10 +51,7 @@ object StreamingKafkaExample  {
     val wordCounts = words.map(x => (x, 1L)).reduceByKey(_ + _)
     wordCounts.print()
 
-//    val file = new File("zzz.csv")
-//    val printWriter = new PrintWriter(file)
-//    printWriter.println(wordCounts.print())
-//    printWriter.close()
+
 
 //    stream.foreachRDD { rdd =>
 //      val offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
@@ -58,16 +61,37 @@ object StreamingKafkaExample  {
 //      }
 //    }
 
-    val hbaseConf = HBaseConfiguration.create()
-    hbaseConf.set("hbase.zookeeper.quorum", "localhost");
-    hbaseConf.set("hbase.zookeeper.property.clientPort", "2181");
-    val connection = ConnectionFactory.createConnection(hbaseConf)
-    val table = connection.getTable(TableName.valueOf( Bytes.toBytes("conta") ) )
+//    val hbaseConf = HBaseConfiguration.create()
+//    hbaseConf.set("hbase.zookeeper.quorum", "localhost");
+//    hbaseConf.set("hbase.zookeeper.property.clientPort", "2181");
+//    val connection = ConnectionFactory.createConnection(hbaseConf)
+//    val table = connection.getTable(TableName.valueOf(Bytes.toBytes(CONTA)))
+//    var lines1 : Array[String] = ()
+    stream.foreachRDD(rdd => {
 
-    // Put example
-    var put = new Put(Bytes.toBytes("row1"))
-    put.addColumn(Bytes.toBytes("cf"), Bytes.toBytes("test_column_name"), Bytes.toBytes("test_value"))
-    table.put(put)
+      if (!rdd.isEmpty()) {
+        // Put example
+        rdd.foreach(element => {
+          val hbaseConf = HBaseConfiguration.create()
+          hbaseConf.set("hbase.zookeeper.quorum", "localhost");
+          hbaseConf.set("hbase.zookeeper.property.clientPort", "2181");
+          val connection = ConnectionFactory.createConnection(hbaseConf)
+          val table = connection.getTable(TableName.valueOf(Bytes.toBytes(CONTA)))
+          System.out.println(element.value())
+          val lines = element.value().split(";")
+//          val acc : Account = Account(lines(0), lines(1))
+          val put = new Put(Bytes.toBytes(element.value()))
+//          put.addColumn(Bytes.toBytes("cf"), Bytes.toBytes("bank"), Bytes.toBytes(acc.bank)
+//          put.addColumn(Bytes.toBytes("cf"), Bytes.toBytes("account"), Bytes.toBytes(acc.accountName))
+          put.addColumn(Bytes.toBytes("cf"), Bytes.toBytes("bank"), Bytes.toBytes(lines(0)))
+          put.addColumn(Bytes.toBytes("cf"), Bytes.toBytes("account"), Bytes.toBytes(lines(1)))
+          table.put(put)
+        })
+      }
+
+    })
+
+
 
 
     streamingContext.start()
