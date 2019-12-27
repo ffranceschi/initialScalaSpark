@@ -55,19 +55,19 @@ class Runner extends java.io.Serializable {
       if (!rdd.isEmpty()) {
         val completed: RDD[(String, Account)] =
           rdd.map(element => {
-            System.out.println("VALOR DO ELEMENTE => " + element.value())
+//            System.out.println("VALOR DO ELEMENTE => " + element.value())
           val lines = element.value().split(";")
           val acc : Account = Account(lines(0), lines(1))
           val rowkey = element.value()
           (rowkey, acc)
         })
         completed.foreach(HBaseConnector.putRow)
-        completed.foreach(i => {
-          System.out.println("Valor eh")
-          System.out.println(i._1)
-          System.out.println(i._2)
-
-        })
+//        completed.foreach(i => {
+//          System.out.println("Valor eh")
+//          System.out.println(i._1)
+//          System.out.println(i._2)
+//
+//        })
       }
     })
 
