@@ -5,7 +5,7 @@ agent1.channels.c1.type = memory
 # to bind to 0.0.0.0:41414. Connect it to channel ch1.
 agent1.sources.r1.channels = c1
 agent1.sources.r1.type = spooldir
-agent1.sources.r1.spoolDir = /Users/fernando/teste/source
+agent1.sources.r1.spoolDir = /Users/fernando/Documents/workspace_scala/initialScalaSpark/generate
 
  
 # Define a logger sink that simply logs all events it receives
@@ -13,7 +13,7 @@ agent1.sources.r1.spoolDir = /Users/fernando/teste/source
 agent1.sinks.k1.channel = c1
 agent1.sinks.k1.type = org.apache.flume.sink.kafka.KafkaSink
 agent1.sinks.k1.kafka.topic = teste1
-agent1.sinks.k1.kafka.bootstrap.servers = localhost:9092
+agent1.sinks.k1.kafka.bootstrap.servers = parallels-Parallels-Virtual-Platform:9092
 agent1.sinks.k1.kafka.flumeBatchSize = 20
 agent1.sinks.k1.kafka.producer.acks = 1
 agent1.sinks.k1.kafka.producer.linger.ms = 1

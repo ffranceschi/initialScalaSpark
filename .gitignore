@@ -18,3 +18,4 @@ target/.history
 target/scala-2.12/initialscalaspark_2.12-0.1.jar
 target/scala-2.12/resolution-cache/
 target/streams/
+/generate/abc.csv
