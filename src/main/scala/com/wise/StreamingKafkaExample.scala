@@ -1,8 +1,5 @@
 package com.wise
 
-import org.apache.hadoop.hbase.client.{ConnectionFactory, Put}
-import org.apache.hadoop.hbase.util.Bytes
-import org.apache.hadoop.hbase.{HBaseConfiguration, TableName}
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark._
 import org.apache.spark.rdd.RDD
@@ -44,13 +41,6 @@ class Runner extends java.io.Serializable {
       Subscribe[String, String](topics, kafkaParams)
     )
 
-//    val lines = stream.map(_.value)
-//    val words = lines.flatMap(_.split(" "))
-//    val wordCounts = words.map(x => (x, 1L)).reduceByKey(_ + _)
-//    wordCounts.print()
-
-
-
     stream.foreachRDD(rdd => {
       if (!rdd.isEmpty()) {
         val completed: RDD[(String, Account)] =
@@ -62,14 +52,10 @@ class Runner extends java.io.Serializable {
           (rowkey, acc)
         })
         completed.foreach(HBaseConnector.putRow)
-//        completed.foreach(i => {
-//          System.out.println("Valor eh")
-//          System.out.println(i._1)
-//          System.out.println(i._2)
-//
-//        })
+
       }
     })
+
 
     streamingContext.start()
     streamingContext.awaitTermination()
