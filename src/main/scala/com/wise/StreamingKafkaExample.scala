@@ -44,10 +44,10 @@ class Runner extends java.io.Serializable {
       Subscribe[String, String](topics, kafkaParams)
     )
 
-    val lines = stream.map(_.value)
-    val words = lines.flatMap(_.split(" "))
-    val wordCounts = words.map(x => (x, 1L)).reduceByKey(_ + _)
-    wordCounts.print()
+//    val lines = stream.map(_.value)
+//    val words = lines.flatMap(_.split(" "))
+//    val wordCounts = words.map(x => (x, 1L)).reduceByKey(_ + _)
+//    wordCounts.print()
 
 
 
