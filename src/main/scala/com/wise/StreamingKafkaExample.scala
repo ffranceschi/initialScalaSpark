@@ -57,6 +57,25 @@ class Runner extends java.io.Serializable {
     })
 
 
+    // funciona tb
+//    stream.foreachRDD(rddpartition => {
+//      rddpartition.foreachPartition(rdd => {
+//        if (!rdd.isEmpty) {
+//          val completed: Iterator[(String, Account)] =
+//            rdd.map(element => {
+//              //                        System.out.println("VALOR DO ELEMENTE => " + element.value())
+//              val lines = element.value().split(";").toSeq
+//              val acc: Account = Account(lines(0), lines(1))
+//              val rowkey = element.value()
+//              (rowkey, acc)
+//            })
+//
+//          completed.foreach(HBaseConnector.putRow)
+//
+//        }
+//      })
+//    })
+
     streamingContext.start()
     streamingContext.awaitTermination()
   }

@@ -38,7 +38,6 @@ object HBaseConnector {
     case(key: String, acc: Account) =>
       val table = getOrCreateTable(accountTable)
       table.put(convertToPutCache(key, "bank", acc.bank.concat("|".concat(acc.accountName))))
-      table.
 //      table.put(convertToPutCache(key, "account", acc.accountName))
 
   }
@@ -67,5 +66,7 @@ object HBaseConnector {
     put.addColumn(accountTable.cfs("cf"), accountTable.columns(column), Bytes.toBytes(value))
     put
   }
+
+
 
 }

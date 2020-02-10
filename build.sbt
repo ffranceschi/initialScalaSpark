@@ -7,22 +7,24 @@ scalaVersion := "2.11.8"
 // Spark Information
 val sparkVersion = "2.4.0"
 val kafkaVersion = "2.2.1"
+val hbaseVersion = "2.2.1"
 
-// allows us to include spark packages
-resolvers += "bintray-spark-packages" at
-  "https://dl.bintray.com/spark-packages/maven/"
-
-resolvers += "Typesafe Simple Repository" at
-  "http://repo.typesafe.com/typesafe/simple/maven-releases/"
-
-resolvers += "MavenRepository" at
-  "https://mvnrepository.com/"
+resolvers ++= Seq(
+  "Cloudera repos" at "https://repository.cloudera.com/artifactory/cloudera-repos",
+  "Cloudera releases" at "https://repository.cloudera.com/artifactory/libs-release",
+  "MavenRepository" at "https://mvnrepository.com/",
+  "bintray-spark-packages" at "https://dl.bintray.com/spark-packages/maven/",
+  "Typesafe Simple Repository" at "http://repo.typesafe.com/typesafe/simple/maven-releases/"
+)
 
 libraryDependencies ++= Seq(
   // hbase
-  "org.apache.hbase" % "hbase-client" % "1.4.9" % "provided",
-  "org.apache.hbase" % "hbase-common" % "1.4.9" % "provided",
-  "org.apache.hbase" % "hbase-server" % "1.4.9" % "provided",
+  "org.apache.hbase" % "hbase-client" % hbaseVersion % "provided",
+  "org.apache.hbase" % "hbase-common" % hbaseVersion % "provided",
+  "org.apache.hbase" % "hbase-server" % hbaseVersion % "provided",
+  "org.apache.hbase" % "hbase-spark" % "2.1.0-cdh6.3.3" % "provided",
+//  "org.apache.hadoop.hbase.spark.HBaseContext" % "hbase-spark" % hbaseVersion % "provided",
+  "eu.unicredit" %% "hbase-rdd" % "0.9.0",
 
   // spark core
   "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
