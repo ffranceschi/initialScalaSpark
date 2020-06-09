@@ -39,9 +39,9 @@ object StreamBuilder {
       .initialPosition(new KinesisInitialPositions.TrimHorizon())
       .checkpointAppName("fernandostream2")
       .checkpointInterval(checkpointInterval)
-      .dynamoDBCredentials(SparkAWSCredentials.builder.basicCredentials("AKIAVBV4NQ3L2IWTJZ6R", "1T45sTwMLoqxDmydYAhPe/JRcEAm5B2jL2+5nfsA").build())
+      .dynamoDBCredentials(SparkAWSCredentials.builder.basicCredentials("", "").build())
       .storageLevel(StorageLevel.MEMORY_AND_DISK_2)
-      .kinesisCredentials(SparkAWSCredentials.builder.basicCredentials("AKIAVBV4NQ3L2IWTJZ6R", "1T45sTwMLoqxDmydYAhPe/JRcEAm5B2jL2+5nfsA").build())
+      .kinesisCredentials(SparkAWSCredentials.builder.basicCredentials("", "").build())
       .build()
   }
 
