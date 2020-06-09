@@ -3,15 +3,26 @@ package com.wise
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDescriptor, TableName}
 import org.apache.hadoop.hbase.client.{Admin, Connection, ConnectionFactory, Put, Table}
+import org.apache.hadoop.hbase.mapreduce.TableInputFormat
 import org.apache.hadoop.hbase.util.Bytes
+import org.apache.log4j.Logger
+
+import scala.xml.XML
 
 object HBaseConnector {
 
     val config: Configuration = HBaseConfiguration.create
-    config.set("hbase.zookeeper.quorum", "localhost");
-    config.set("hbase.zookeeper.property.clientPort", "2181");
+//    val hbaseXmlFl = XML.loadFile("/etc/hbase/conf.dist/hbase-site.xml") \\ "property"  // Rodar remoto
+//    val zookeeperQuorum = (hbaseXmlFl.filter(n => n.text.contains("hbase.zookeeper.quorum")) \ "value").text.trim   // Rodar remoto
+//    val hbaseRootVal = (hbaseXmlFl.filter(n => n.text.contains("hbase.rootdir")) \ "value").text.trim   // Rodar remoto
+//  config.set("hbase.zookeeper.quorum", zookeeperQuorum)
+//  config.set("hbase.rootdir", hbaseRootVal)
+    config.set("hbase.zookeeper.quorum", "localhost") // Rodar local
+    config.set("hbase.zookeeper.property.clientPort", "2181")  // Rodar local
     val connection: Connection = ConnectionFactory.createConnection(config)
     val admin: Admin = connection.getAdmin
+
+
 
     abstract class TableProps{
       def name: String
@@ -34,21 +45,42 @@ object HBaseConnector {
 
 
   // Put row from RDD
-  def putRow(data: (String, Any)): Unit = data match{
-    case(key: String, acc: Account) =>
-      val table = getOrCreateTable(accountTable)
-      table.put(convertToPutCache(key, "bank", acc.bank.concat("|".concat(acc.accountName))))
-//      table.put(convertToPutCache(key, "account", acc.accountName))
+//  def putRow(data: (String, Any)): Unit =
+//    data match {
+//      case(key: String, acc: Account) =>
+//        println("--------- entrou em conta")
+//        val table = getOrCreateTable(accountTable)
+//        table.put(convertToPutCache(key, "bank", acc.bank.concat("|".concat(acc.accountName))))
+//      case(key: String, acc: String) =>
+//        println("--------- entrou em string")
+//        val table = getOrCreateTable(accountTable)
+//        table.put(convertToPutCache(key, "bank", acc))
+//  }
 
+  // Put row from RDD
+  def putRow(data: (String, Any), table: Table): Unit = data match{
+    case(rowKey: String, account: Account) =>
+      table.put(convertToPutAccount(rowKey, account))
+
+    case _ =>
+      Logger.getLogger(this.getClass).info(s"ERROR PUT ROW: ${data._1}:${data._2}")
+  }
+
+  def convertToPutAccount(rowKey: String, account: Account): Put = {
+    val put = new Put(Bytes.toBytes(rowKey))
+    put.addColumn(accountTable.cfs("cfAccountData"), accountTable.columns("linha"), Bytes.toBytes(account.accountName))
+    put
   }
 
   // Get table if exists, else create table
-  def getOrCreateTable(table: TableProps): Table = {
-    val tableName = TableName.valueOf(table.name)
+  def getOrCreateTable(table: BasicTable): Table = {
+    val tableName = TableName.valueOf(s"${table.namespace}:${table.name}")
     if (!admin.tableExists(tableName)) {
-      println(s"Creating ${table.name} Table")
+      Logger.getLogger(this.getClass).info(s"Creating ${table.name} Table")
       val tableDesc = new HTableDescriptor(tableName)
-      table.cfs.foreach(cf => tableDesc.addFamily(new HColumnDescriptor(cf._2)))
+      for (cf <- table.columns.values.toList.distinct) {
+        tableDesc.addFamily(new HColumnDescriptor(cf))
+      }
       admin.createTable(tableDesc)
     }
     connection.getTable(tableName)
@@ -68,5 +100,27 @@ object HBaseConnector {
   }
 
 
+  def buildConf(inputTable: String, scanRowStart: String, scanRowStop: String): Configuration = {
+    val conf: Configuration = HBaseConfiguration.create
+    //conf.addResource("/etc/hbase/conf.dist/hbase-site.xml"); //172.31.43.208
+    //val ip = System.getenv("SPARK_MASTER_IP")
+    //    conf.set("hbase.zookeeper.quorum", zookeeperQuorum)
+    //    conf.set("hbase.rootdir", hbaseRootVal)
+    //conf.set("hbase.zookeeper.quorum", s"${ip}:2181")
+    //conf.set("hbase.rootdir", s"hdfs://${ip}:8020/user/hbase")
+    conf.set(TableInputFormat.INPUT_TABLE, inputTable)
+    conf.set(TableInputFormat.SCAN_ROW_START, scanRowStart)
+    conf.set(TableInputFormat.SCAN_ROW_STOP, scanRowStop)
+
+
+    conf
+  }
+
+  def buildConf(inputTable: String, scanRowStart: String, scanRowStop: String, scanColumns: String): Configuration = {
+    val conf: Configuration = this.buildConf(inputTable, scanRowStart, scanRowStop)
+    conf.set(TableInputFormat.SCAN_COLUMNS, scanColumns)
+
+    conf
+  }
 
 }

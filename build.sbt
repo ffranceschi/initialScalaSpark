@@ -7,7 +7,9 @@ scalaVersion := "2.11.8"
 // Spark Information
 val sparkVersion = "2.4.0"
 val kafkaVersion = "2.2.1"
-val hbaseVersion = "2.2.1"
+val hbaseVersion = "1.4.9"
+
+
 
 resolvers ++= Seq(
   "Cloudera repos" at "https://repository.cloudera.com/artifactory/cloudera-repos",
@@ -22,19 +24,23 @@ libraryDependencies ++= Seq(
   "org.apache.hbase" % "hbase-client" % hbaseVersion % "provided",
   "org.apache.hbase" % "hbase-common" % hbaseVersion % "provided",
   "org.apache.hbase" % "hbase-server" % hbaseVersion % "provided",
-  "org.apache.hbase" % "hbase-spark" % "2.1.0-cdh6.3.3" % "provided",
+//  "org.apache.hbase" % "hbase-spark" % "2.1.0-cdh6.3.3" % "provided", // funciona no hbase 2.2.1
 //  "org.apache.hadoop.hbase.spark.HBaseContext" % "hbase-spark" % hbaseVersion % "provided",
-  "eu.unicredit" %% "hbase-rdd" % "0.9.0",
+//  "eu.unicredit" %% "hbase-rdd" % "0.9.0",
 
   // spark core
   "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
   "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
   "org.apache.spark" %% "spark-streaming" % sparkVersion % "provided",
   "org.apache.spark" %% "spark-streaming-kafka-0-10" % sparkVersion % "provided",
+  "org.apache.spark" %% "spark-streaming-kinesis-asl" % sparkVersion % "provided",
   "org.apache.kafka" %% "kafka" % kafkaVersion,
   "org.apache.kafka" %% "kafka-streams-scala" % kafkaVersion,
   "org.apache.logging.log4j" % "log4j-api" % "2.12.1",
-  "org.apache.logging.log4j" % "log4j-core" % "2.12.1"
+  "org.apache.logging.log4j" % "log4j-core" % "2.12.1",
+//  "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor" % "2.6.9",
+  "joda-time" % "joda-time" % "2.9.9" % "compile",
+  "org.joda" % "joda-convert" % "2.2.1" % "compile",
 
   // the rest of the file is omitted for brevity
 )

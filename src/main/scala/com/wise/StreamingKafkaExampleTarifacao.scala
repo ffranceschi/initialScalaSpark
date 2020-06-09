@@ -8,17 +8,17 @@ import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010._
 
-case class Account(bank: String, accountName: String)
 
-object StreamingKafkaExample {
+
+object StreamingKafkaExampleTarifacao {
 
   def main(args: Array[String]) = {
-    new Runner().run
+    new Runner3().run
   }
 }
 
 
-class Runner extends java.io.Serializable {
+class Runner3 extends java.io.Serializable {
   def run : Unit = {
 //    val conf = new SparkConf().setMaster("local[*]").setAppName("streaming teste")
     val conf = new SparkConf().setAppName("streaming teste")
@@ -31,12 +31,12 @@ class Runner extends java.io.Serializable {
       "bootstrap.servers" -> "localhost:9092",
       "key.deserializer" -> classOf[StringDeserializer],
       "value.deserializer" -> classOf[StringDeserializer],
-      "group.id" -> "consumer1",
+      "group.id" -> "use_a_separate_group_id_for_each_stream",
       "auto.offset.reset" -> "latest",
       "enable.auto.commit" -> (false: java.lang.Boolean)
     )
 
-    val topics = Array("teste1")
+    val topics = Array("teste2")
     val stream = KafkaUtils.createDirectStream[String, String](
       streamingContext,
       PreferConsistent,

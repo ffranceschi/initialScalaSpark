@@ -34,7 +34,7 @@ class Runner2 extends java.io.Serializable {
     var connection: Connection = null
     try {
       connection = ConnectionFactory.createConnection(conf)
-      table = connection.getTable(TableName.valueOf("cache"))
+      table = connection.getTable(TableName.valueOf("testBatch"))
       val iteratorArray = iterator.toArray
 //      val rowList = new util.ArrayList[Get]()
 //      for (row <- iteratorArray) {
@@ -91,21 +91,22 @@ class Runner2 extends java.io.Serializable {
   }
 
   def run : Unit = {
-    val confSpark = new SparkConf().setMaster("local[*]").setAppName("streaming teste")
 
-    val streamingContext = new StreamingContext(confSpark, Seconds(10))
+    val conf = new SparkConf().setAppName("streaming teste")
+
+    val streamingContext = new StreamingContext(conf, Seconds(10))
     val sc = streamingContext.sparkContext
 
     val kafkaParams = Map[String, Object](
-      "bootstrap.servers" -> "parallels-Parallels-Virtual-Platform:9092",
+      "bootstrap.servers" -> "localhost:9092",
       "key.deserializer" -> classOf[StringDeserializer],
       "value.deserializer" -> classOf[StringDeserializer],
-      "group.id" -> "use_a_separate_group_id_for_each_stream",
+      "group.id" -> "consumer2Batch",
       "auto.offset.reset" -> "latest",
       "enable.auto.commit" -> (false: java.lang.Boolean)
     )
 
-    val topics = Array("teste1")
+    val topics = Array("teste2")
     val stream : InputDStream[ConsumerRecord[String, String]] = KafkaUtils.createDirectStream[String, String](
       streamingContext,
       PreferConsistent,
@@ -113,7 +114,7 @@ class Runner2 extends java.io.Serializable {
     )
 
     stream.foreachRDD(rdd =>
-      rdd.foreachPartition(iterator => hbaseWriter(iterator, "cf"))
+      rdd.foreachPartition(iterator => hbaseWriter(iterator, "data"))
     )
 
 //  val conf : org.apache.hadoop.conf.Configuration = HBaseConfiguration.create()
