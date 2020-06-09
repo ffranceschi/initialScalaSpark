@@ -46,8 +46,7 @@ object StreamBuilder {
   }
 
   def putMessage() = {
-//    val credentials = new BasicAWSCredentials("AKIAVBV4NQ3L2IWTJZ6R", "1T45sTwMLoqxDmydYAhPe/JRcEAm5B2jL2+5nfsA")
-    val credentials = new MyCredentals("AKIAVBV4NQ3L2IWTJZ6R", "1T45sTwMLoqxDmydYAhPe/JRcEAm5B2jL2+5nfsA")
+    val credentials = new MyCredentals("", "")
     val clientConfiguration = new ClientConfiguration
     val clientBuilder = AmazonKinesisClientBuilder.standard()
     clientBuilder.setCredentials(credentials)
